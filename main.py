@@ -3,18 +3,17 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-#term = input("Enter a term: ")
-def obtain_years():
+
+def obtain_years(term):
     Entrez.email = "A.N.Other@example.com"  # Always tell NCBI who you are
-    #handle = Entrez.egquery(term=term)
-    handle = Entrez.egquery(term="orchid")
+    handle = Entrez.egquery(term=term)
     record = Entrez.read(handle)
     for row in record["eGQueryResult"]:
         if row["DbName"]=="pubmed":
             print(row["Count"])
 
     Entrez.email = "A.N.Other@example.com"  # Always tell NCBI who you are
-    handle = Entrez.esearch(db="pubmed", term="covid", retmax=463)
+    handle = Entrez.esearch(db="pubmed", term=term, retmax=2836)
     record = Entrez.read(handle)
     handle.close()
     idlist = record["IdList"]
@@ -31,13 +30,15 @@ def obtain_years():
         source = record.get("SO", "?")
         #print(source.split("."))
         split_source = (source.split("."))
-        #print(split_source[1])
-        specific_source = (split_source[1].split(" "))
-        #print(specific_source[1])
-        year = specific_source[1][0:4]
-        #print(year)
-        #print("")
-        list_of_years.append(year)
+        # To prevent an error when the source is ?.
+        if " " in split_source:
+            print("split_source")
+            specific_source = (split_source[1].split(" "))
+            #print(specific_source[1])
+            year = specific_source[1][0:4]
+            #print(year)
+            #print("")
+            list_of_years.append(year)
 
     print(list_of_years)
     return list_of_years
@@ -86,24 +87,40 @@ def barplot(dictionary):
     plt.title("Amount of hits per period")
     plt.show()
 
-#def barplotcombined(dictionary, dictionary2):
-    #keys = dictionary.keys()
-    #values = dictionary.values()
-    #keys2 = dictionary2.keys()
-    #values2 = dictionary2.values()
-    #plt.bar(keys, values, keys2, values2, color='maroon', width=0.4)
+def barplot_combined(dictionary, dictionary2, term, term2):
+    keys = dictionary.keys()
+    values = dictionary.values()
+    keys2 = dictionary2.keys()
+    values2 = dictionary2.values()
 
-    #plt.xlabel("Period")
-    #plt.ylabel("Amount of hits")
-    #plt.title("Amount of hits per period of two terms")
-    #plt.show()
+    x = np.arange(len(dictionary.keys()))  # the label locations
+    width = 0.35  # the width of the bars
 
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width / 2, dictionary.values(), width, label=term)
+    rects2 = ax.bar(x + width / 2, dictionary2.values(), width, label=term2)
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Period')
+    ax.set_ylabel('Amount of hits')
+    ax.set_title('Amount of hits per period')
+    ax.set_xticks(x, dictionary.keys())
+    ax.legend()
+
+    ax.bar_label(rects1, padding=3)
+    ax.bar_label(rects2, padding=3)
+
+    fig.tight_layout()
+
+    plt.show()
 if __name__ == '__main__':
-    list_of_years = obtain_years()
-    dictionairy = count_per_period(list_of_years)
-    barplot(dictionairy)
-    #compare = input("Do you want to compare this to another term? y/n: ")
-    #   if compare == "y":
-    #       list_of_years2 = obtain_years()
-    #       dictionairy2 = count_per_period(list_of_years2)
-    #       barplot_combined(dictionairy2)
+    term = input("Enter a term: ")
+    list_of_years = obtain_years(term)
+    dictionary = count_per_period(list_of_years)
+    barplot(dictionary)
+    compare = input("Do you want to compare this to another term? y/n: ")
+    if compare == "y":
+        term2 = input("Enter another term: ")
+        list_of_years2 = obtain_years(term2)
+        dictionary2 = count_per_period(list_of_years2)
+        barplot_combined(dictionary, dictionary2, term, term2)
