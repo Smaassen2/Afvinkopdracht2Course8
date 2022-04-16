@@ -84,19 +84,15 @@ def barplot(dictionary):
     keys = dictionary.keys()
     values = dictionary.values()
     plt.bar(keys, values, color='maroon', width=0.4)
-
+    plt.legend([term])
     plt.xlabel("Period")
     plt.ylabel("Amount of hits")
     plt.title("Amount of hits per period")
     plt.xticks(rotation=90)
+    plt.tight_layout()
     plt.show()
 
 def barplot_combined(dictionary, dictionary2, term, term2):
-    keys = dictionary.keys()
-    values = dictionary.values()
-    keys2 = dictionary2.keys()
-    values2 = dictionary2.values()
-
     x = np.arange(len(dictionary.keys()))  # the label locations
     width = 0.35  # the width of the bars
 
@@ -111,12 +107,16 @@ def barplot_combined(dictionary, dictionary2, term, term2):
     ax.set_xticks(x, dictionary.keys())
     ax.legend()
 
-    ax.bar_label(rects1, padding=3)
-    ax.bar_label(rects2, padding=3)
+    #ax.bar_label(rects1, padding=3)
+    #ax.bar_label(rects2, padding=3)
 
-    fig.tight_layout()
-
+    plt.xlabel("Period")
+    plt.ylabel("Amount of hits")
+    plt.title("Amount of hits per period")
+    plt.xticks(rotation=90)
+    plt.tight_layout()
     plt.show()
+
 if __name__ == '__main__':
     term = input("Enter a term: ")
     list_of_years = obtain_years(term)
