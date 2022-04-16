@@ -11,9 +11,10 @@ def obtain_years(term):
     for row in record["eGQueryResult"]:
         if row["DbName"]=="pubmed":
             print(row["Count"])
+            amount_of_hits = int(row["Count"])
 
     Entrez.email = "A.N.Other@example.com"  # Always tell NCBI who you are
-    handle = Entrez.esearch(db="pubmed", term=term, retmax=2836)
+    handle = Entrez.esearch(db="pubmed", term=term, retmax=amount_of_hits)
     record = Entrez.read(handle)
     handle.close()
     idlist = record["IdList"]
@@ -31,8 +32,7 @@ def obtain_years(term):
         #print(source.split("."))
         split_source = (source.split("."))
         # To prevent an error when the source is ?.
-        if " " in split_source:
-            print("split_source")
+        if split_source[0] != "?":
             specific_source = (split_source[1].split(" "))
             #print(specific_source[1])
             year = specific_source[1][0:4]
@@ -46,9 +46,9 @@ def obtain_years(term):
 
 def count_per_period(list_of_years):
     dictionary = {}
-    bottom_year = 2001
-    top_year = 2005
-    current_year = 2025
+    bottom_year = 1901
+    top_year = 1905
+    current_year = 2022
     amount_of_periods = math.ceil((current_year-top_year)/5 + 1)
     #print(amount_of_periods)
     #print(range(amount_of_periods))
@@ -78,6 +78,9 @@ def count_per_period(list_of_years):
     return dictionary
 
 def barplot(dictionary):
+    # change the fontsize of the xtick and ytick labels
+    plt.rc('xtick', labelsize=5)
+
     keys = dictionary.keys()
     values = dictionary.values()
     plt.bar(keys, values, color='maroon', width=0.4)
@@ -85,6 +88,7 @@ def barplot(dictionary):
     plt.xlabel("Period")
     plt.ylabel("Amount of hits")
     plt.title("Amount of hits per period")
+    plt.xticks(rotation=90)
     plt.show()
 
 def barplot_combined(dictionary, dictionary2, term, term2):
